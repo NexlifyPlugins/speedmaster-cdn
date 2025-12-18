@@ -1,3 +1,36 @@
+(async function () {
+  try {
+    const script = document.currentScript;
+    const license = script?.getAttribute("data-license");
+    const domain = location.hostname;
+
+    if (!license) {
+      console.warn("[SpeedMaster] License missing. Disabled.");
+      return; // ⛔ إيقاف كامل
+    }
+
+    const res = await fetch(
+      "https://ancient-fire-7f4e.contentdz2024.workers.dev/verify" +
+      "?license=" + encodeURIComponent(license) +
+      "&domain=" + encodeURIComponent(domain)
+    );
+
+    const data = await res.json();
+
+    if (!data.valid) {
+      console.warn("[SpeedMaster] Invalid license. Disabled.");
+      return; // ⛔ إيقاف كامل
+    }
+
+    // ✅ الترخيص صحيح — نكمل تشغيل SpeedMaster
+    window.__SPEEDMASTER_ACTIVE__ = true;
+
+  } catch (e) {
+    console.warn("[SpeedMaster] License check failed. Disabled.", e);
+    return; // ⛔ أمان إضافي
+  }
+})();
+
 (function () {
   'use strict';
 
