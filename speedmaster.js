@@ -1,3 +1,23 @@
+(function () {
+  const LICENSE_KEY = window.SPEEDMASTER_LICENSE || "";
+  const DOMAIN = location.hostname;
+  const VERIFY_URL = "https://ancient-fire-7f4e.contentdz2024.workers.dev/verify";
+
+  fetch(`${VERIFY_URL}?license=${encodeURIComponent(LICENSE_KEY)}&domain=${encodeURIComponent(DOMAIN)}`)
+    .then(r => r.json())
+    .then(res => {
+      if (!res.valid) {
+        console.warn("[SpeedMaster] License check failed");
+        return;
+      }
+
+      console.log("[SpeedMaster] License valid");
+      window.SPEEDMASTER_ENABLED = true;
+    })
+    .catch(() => {
+      console.warn("[SpeedMaster] License server unreachable");
+    });
+})();
 /* =========================================================
    SpeedMaster Auto PRO – License Protection Layer
 ========================================================= */
