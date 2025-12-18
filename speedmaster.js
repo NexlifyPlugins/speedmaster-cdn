@@ -1,71 +1,80 @@
+/* =========================================================
+   SpeedMaster Auto PRO – License Protection Layer
+========================================================= */
 (async function () {
   try {
-    const script = document.currentScript;
-    const license = script?.getAttribute("data-license");
-    const domain = location.hostname;
+    const LICENSE = window.SPEEDMASTER_LICENSE;
+    const DOMAIN = location.hostname;
 
-    if (!license) {
-      console.warn("[SpeedMaster] License missing. Disabled.");
-      return; // ⛔ إيقاف كامل
+    if (!LICENSE) {
+      console.warn("[SpeedMaster] Missing license");
+      return;
     }
 
-    const res = await fetch(
-      "https://ancient-fire-7f4e.contentdz2024.workers.dev/verify" +
-      "?license=" + encodeURIComponent(license) +
-      "&domain=" + encodeURIComponent(domain)
+    const response = await fetch(
+      "https://ancient-fire-7f4e.workers.dev/verify" +
+        "?license=" + encodeURIComponent(LICENSE) +
+        "&domain=" + encodeURIComponent(DOMAIN),
+      { cache: "no-store" }
     );
 
-    const data = await res.json();
+    const data = await response.json();
 
     if (!data.valid) {
-      console.warn("[SpeedMaster] Invalid license. Disabled.");
-      return; // ⛔ إيقاف كامل
+      console.warn("[SpeedMaster] Invalid license");
+      return;
     }
 
-    // ✅ الترخيص صحيح — نكمل تشغيل SpeedMaster
-    window.__SPEEDMASTER_ACTIVE__ = true;
+    window.__SPEEDMASTER_ALLOWED__ = true;
+    console.log("[SpeedMaster] License verified");
 
   } catch (e) {
-    console.warn("[SpeedMaster] License check failed. Disabled.", e);
-    return; // ⛔ أمان إضافي
+    console.warn("[SpeedMaster] License check failed");
+    return;
   }
 })();
 
+/* =========================================================
+   SpeedMaster Auto PRO – Core Optimization Engine
+========================================================= */
 (function () {
-  'use strict';
+  if (!window.__SPEEDMASTER_ALLOWED__) return;
 
-  if (window.__SPEEDMASTER_ACTIVE__) return;
-  window.__SPEEDMASTER_ACTIVE__ = true;
+  console.log("[SpeedMaster] Optimization enabled");
 
-  console.log('[SpeedMaster] Script loaded');
-
-  // Lazy-load images
-  document.querySelectorAll('img:not([loading])').forEach(function (img) {
-    img.setAttribute('loading', 'lazy');
-    img.setAttribute('decoding', 'async');
-  });
-
-  // Defer non-critical scripts
-  document.querySelectorAll('script[src]').forEach(function (s) {
-    var src = s.getAttribute('src') || '';
-    if (
-      !s.defer &&
-      !s.async &&
-      !/google|gtag|analytics|stripe|paypal/i.test(src)
-    ) {
-      s.defer = true;
+  /* ---------- Lazy Load Images ---------- */
+  document.querySelectorAll("img").forEach(img => {
+    if (!img.hasAttribute("loading")) {
+      img.setAttribute("loading", "lazy");
     }
   });
 
-  // Preconnect common CDNs
-  ['https://fonts.googleapis.com', 'https://fonts.gstatic.com'].forEach(function (href) {
-    if (document.querySelector('link[href="' + href + '"]')) return;
-    var l = document.createElement('link');
-    l.rel = 'preconnect';
-    l.href = href;
-    l.crossOrigin = '';
-    document.head.appendChild(l);
+  /* ---------- Defer Non-Critical Scripts ---------- */
+  document.querySelectorAll("script").forEach(script => {
+    if (
+      script.src &&
+      !script.defer &&
+      !script.async &&
+      !script.src.includes("speedmaster")
+    ) {
+      script.defer = true;
+    }
   });
 
-  console.log('[SpeedMaster] Optimization enabled');
+  /* ---------- Preconnect Common Origins ---------- */
+  const origins = new Set();
+  document.querySelectorAll("script[src],link[href]").forEach(el => {
+    try {
+      const url = new URL(el.src || el.href);
+      origins.add(url.origin);
+    } catch (e) {}
+  });
+
+  origins.forEach(origin => {
+    const link = document.createElement("link");
+    link.rel = "preconnect";
+    link.href = origin;
+    document.head.appendChild(link);
+  });
+
 })();
