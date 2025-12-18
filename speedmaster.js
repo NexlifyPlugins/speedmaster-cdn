@@ -32,7 +32,7 @@
     }
 
     const response = await fetch(
-      "https://ancient-fire-7f4e.workers.dev/verify" +
+      "https://ancient-fire-7f4e.contentdz2024.workers.dev/verify" +
         "?license=" + encodeURIComponent(LICENSE) +
         "&domain=" + encodeURIComponent(DOMAIN),
       { cache: "no-store" }
